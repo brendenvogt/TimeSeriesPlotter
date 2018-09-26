@@ -10,15 +10,11 @@ exampleSocket.onclose = function (event) {
     console.log("Goodbye");
 };
 
-exampleSocket.onmessage = function (event) {
-    // console.log(event.data);
+var samples = new Array();
 
+exampleSocket.onmessage = function (event) {
     var val = parseInt(event.data, 10);
-    Plotly.extendTraces('graph', {
-        // y: [[rand()]]
-        y: [[val]]
-    }, [0])
-    document.getElementById("response").innerHTML = val;
+    samples.push(val)
 }
 
 function sendCommand() {
@@ -30,15 +26,9 @@ function sendCommand() {
     exampleSocket.send(text);
 }
 
-
-
-
-function rand() {
-    return Math.random();
-}
-
-function sinx(x) {
-    return Math.sin(x);
+function clearScreen() {
+    Plotly.deleteTraces('graph', 0)
+    Plotly.addTraces('graph', { y: [0] });
 }
 
 Plotly.plot('graph', [{
@@ -47,4 +37,13 @@ Plotly.plot('graph', [{
     line: { color: '#80CAF6' }
 }]);
 
-var cnt = 0;
+var interval = setInterval(function () {
+    if (samples.length != 0) {
+
+        Plotly.extendTraces('graph', {
+            y: [samples]
+        }, [0])
+        samples = [];
+
+    }
+}, 100);
