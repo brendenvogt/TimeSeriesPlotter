@@ -3,11 +3,19 @@
 
 <head>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="main.js"></script>
 </head>
 
 <body>
-    <div id="myDiv"></div>
+    <div id="graph"></div>
+    <div>
+        <form id="commandForm">
+            Command: <input type="text" name="command" value=""><br>
+            <input type="button" onclick="sendCommand()" value="Submit">
+        </form>
+        <p id="response"></p>
+
+    </div>
 </body>
+<script src="main.js"></script>
 
 </html>

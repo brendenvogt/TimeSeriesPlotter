@@ -1,84 +1,50 @@
-Plotly.d3.csv("https://raw.githubusercontent.com/plotly/datasets/master/2014_apple_stock.csv", function (err, rows) {
 
-    function unpack(rows, key) {
-        return rows.map(function (row) { return row[key]; });
-    }
+//Connect to Websocket
+var exampleSocket = new WebSocket("ws://192.168.4.1");
 
-    var frames = []
-    var x = unpack(rows, 'AAPL_x')
-    var y = unpack(rows, 'AAPL_y')
+exampleSocket.onopen = function (event) {
+    console.log("Hello");
+};
 
-    var n = 100;
-    for (var i = 0; i < n; i++) {
-        frames[i] = { data: [{ x: [], y: [] }] }
-        frames[i].data[0].x = x.slice(0, i + 1);
-        frames[i].data[0].y = y.slice(0, i + 1);
-    }
+exampleSocket.onclose = function (event) {
+    console.log("Goodbye");
+};
 
-    Plotly.plot('myDiv', [{
-        x: frames[1].data[0].x,
-        y: frames[1].data[0].y,
-        fill: 'tozeroy',
-        type: 'scatter',
-        mode: 'lines',
-        line: { color: 'blue' }
-    }], {
-            title: "Time Series Plotter",
-            xaxis: {
-                type: 'date',
-                range: [
-                    frames[99].data[0].x[0],
-                    frames[99].data[0].x[99]
-                ]
-            },
-            yaxis: {
-                range: [
-                    0,
-                    90
-                ]
-            },
-            updatemenus: [{
-                x: 0.1,
-                y: 0,
-                yanchor: "top",
-                xanchor: "right",
-                showactive: false,
-                direction: "left",
-                type: "buttons",
-                pad: { "t": 87, "r": 10 },
-                buttons: [{
-                    method: "animate",
-                    args: [null, {
-                        fromcurrent: true,
-                        transition: {
-                            duration: 0,
-                        },
-                        frame: {
-                            duration: 40,
-                            redraw: false
-                        }
-                    }],
-                    label: "Play"
-                }, {
-                    method: "animate",
-                    args: [
-                        [null],
-                        {
-                            mode: "immediate",
-                            transition: {
-                                duration: 0
-                            },
-                            frame: {
-                                duration: 0,
-                                redraw: false
-                            }
-                        }
-                    ],
-                    label: "Pause"
-                }]
-            }]
-        }).then(function () {
-            Plotly.addFrames('myDiv', frames);
-        });
+exampleSocket.onmessage = function (event) {
+    // console.log(event.data);
 
-}) 
+    var val = parseInt(event.data, 10);
+    Plotly.extendTraces('graph', {
+        // y: [[rand()]]
+        y: [[val]]
+    }, [0])
+    document.getElementById("response").innerHTML = val;
+}
+
+function sendCommand() {
+
+    var x = document.getElementById("commandForm");
+
+    var text = x.elements[0].value;
+    console.log(text);
+    exampleSocket.send(text);
+}
+
+
+
+
+function rand() {
+    return Math.random();
+}
+
+function sinx(x) {
+    return Math.sin(x);
+}
+
+Plotly.plot('graph', [{
+    y: [0],
+    mode: 'lines',
+    line: { color: '#80CAF6' }
+}]);
+
+var cnt = 0;
